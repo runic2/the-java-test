@@ -9,9 +9,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,14 +28,18 @@ import org.junit.jupiter.params.converter.SimpleArgumentConverter;
 import org.junit.jupiter.params.provider.CsvSource;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)//test 한 번만 Instance 함
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)//test 순서를 정해줌
 class StudyTests {
 	
+	@Order(4)
 	@DisplayName("스터디 만들기 반복")
 	@RepeatedTest(value = 10, name = "{displayName}, {currentRepetition} / {totalRepetitions}")// 10번 반복, 반복명 설정
 	void create_study_repeat (RepetitionInfo repetitaionInfo) {//반복 상세 내용 받기
 		System.out.println("test  " + repetitaionInfo.getCurrentRepetition() + "/" + repetitaionInfo.getTotalRepetitions());
 	}
 	
+	@Order(3)
 	@DisplayName("스터디 만들기 반복2")
 	@ParameterizedTest(name = "{index} {displayName} message={0}")//밑 파라미터 수 만큼 반복
 //	@ValueSource(strings = {"날씨가", "많이", "추워지고", "있네요"})
@@ -111,11 +119,24 @@ class StudyTests {
 //		
 //	}
 	
+	int value = 1;
+	
+	@Order(1)//test 순서를 정함. 첫번째
+	@SlowTest
+//	@Disabled -> unabled test unit
+//	@Tag("slow")
+	@DisplayName("스터디 만들기 tag slow")
+	void create1_new_study_again () {
+		System.out.println(value++);
+		System.out.println("create slow tag test");
+	}
+	
+	@Order(2)
 	@FastTest //customAnnotation
 	@DisplayName("스터디 만들기 ^^ tag fast")
 //	@Tag("fast") => FastTest로 생략가능
 	void create_new_study () {
-		
+		System.out.println(value++);
 		System.out.println("create fast Tag test");
 		
 		
@@ -174,23 +195,17 @@ class StudyTests {
 //			}
 //		});
 	}
-	
-	@SlowTest
-//	@Disabled -> unabled test unit
-//	@Tag("slow")
-	@DisplayName("스터디 만들기 tag slow")
-	void create1_new_study_again () {
-		System.out.println("create slow tag test");
-	}
 
 	@BeforeAll
-	static void beforeAll () {
+	void beforeAll () {
 		System.out.println("before all");
+		//한번만 instance 하기 때문에 static일 필요 없음
 	}
 	
 	@AfterAll
-	static void afterAll () {
+	void afterAll () {
 		System.out.println("after all");
+		//한번만 instance 하기 때문에 static일 필요 없음
 	}
 	
 	@BeforeEach

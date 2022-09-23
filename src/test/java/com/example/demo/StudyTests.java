@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -27,14 +28,15 @@ import org.junit.jupiter.params.converter.ArgumentConversionException;
 import org.junit.jupiter.params.converter.SimpleArgumentConverter;
 import org.junit.jupiter.params.provider.CsvSource;
 
-@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)//test 한 번만 Instance 함
+//@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class) //underScore => blank
+//@TestInstance(TestInstance.Lifecycle.PER_CLASS)//test 한 번만 Instance 함
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)//test 순서를 정해줌
 class StudyTests {
 	
 	@Order(4)
-	@DisplayName("스터디 만들기 반복")
+	//@DisplayName("스터디 만들기 반복 - disabled")
 	@RepeatedTest(value = 10, name = "{displayName}, {currentRepetition} / {totalRepetitions}")// 10번 반복, 반복명 설정
+	@Disabled
 	void create_study_repeat (RepetitionInfo repetitaionInfo) {//반복 상세 내용 받기
 		System.out.println("test  " + repetitaionInfo.getCurrentRepetition() + "/" + repetitaionInfo.getTotalRepetitions());
 	}

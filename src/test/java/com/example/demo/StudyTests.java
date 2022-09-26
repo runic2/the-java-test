@@ -8,17 +8,17 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.aggregator.AggregateWith;
 import org.junit.jupiter.params.aggregator.ArgumentsAccessor;
@@ -28,10 +28,94 @@ import org.junit.jupiter.params.converter.ArgumentConversionException;
 import org.junit.jupiter.params.converter.SimpleArgumentConverter;
 import org.junit.jupiter.params.provider.CsvSource;
 
-//@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class) //underScore => blank
+//@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class) //replace [underScore => blank]
 //@TestInstance(TestInstance.Lifecycle.PER_CLASS)//test 한 번만 Instance 함
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)//test 순서를 정해줌
+//@ExtendWith(FindSlowTestExtension.class)//선언적으로 등록 - 확장모델
 class StudyTests {
+	
+	int value = 1;
+	
+//	확장 모델 - 프로그래밍 등록 @RegisterExtension
+	@RegisterExtension
+	static FindSlowTestExtension findSlowTestExtension = new FindSlowTestExtension(1000L);
+	
+	@Order(1)//test 순서를 정함. 첫번째
+	@Test
+//	@SlowTest
+//	@Disabled -> unabled test unit
+//	@Tag("slow")
+	@DisplayName("스터디 만들기 tag slow")
+	void create1_new_study_again () throws InterruptedException {
+		Thread.sleep(1005L);
+		System.out.println(value++);
+		System.out.println("create slow tag test");
+	}
+	
+	@Order(2)
+	@FastTest //customAnnotation
+	@DisplayName("스터디 만들기 ^^ tag fast")
+//	@Tag("fast") //=> FastTest로 생략가능
+	void create_new_study () {
+		System.out.println(value++);
+		System.out.println("create fast Tag test");
+		
+		
+		
+//		특정한 조건을 만족하는 경우에 테스트를 실행하는 방법.
+//		환경변수 - test_env 가 local인 경우에 test 진행
+//		String test_env = System.getenv("TEST_ENV");
+//		System.out.println(test_env);
+//		assumeTrue("LOCAL".equalsIgnoreCase(test_env));
+		
+//		특정한 조건을 건 테스트
+//		assumingThat("LOCAL".equalsIgnoreCase(test_env), () -> {
+//			System.out.println("LOCAL");
+//			Study actual = new Study(100);
+//			assertThat(actual.getLimit()).isGreaterThan(0);
+//			
+//		});
+		
+		
+//		특정 시간 안에 실행이 완료되는지 확인
+//		assertTimeout(Duration.ofMillis(100), () -> {
+//			new Study(10);
+//			Thread.sleep(300);			
+//		});
+		// TODO ThreadLocal
+//		assertTimeoutPreemptively(null, null); 로 작성이 @Transaction 형식의 rollback이 실행이 되지 않을 수도 있음.
+//		300밀리초가 끝나지전에 종료
+		
+		
+//		Test 객체의 예외 사항 받기
+//		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new Study(-10));
+//		String message = exception.getMessage();
+//		assertEquals("limit은 0보다 커야한다.", exception.getMessage());
+		
+		
+		
+//		Study study = new Study(-10);
+		
+//		모든 확인 구문 확인 executables
+//		assertAll(
+//			() -> assertNotNull(study),
+//	//		값이 null이 아닌지 확인
+//			() -> assertEquals(StudyStatus.DRAFT, study.getStatus(), () -> "스터디를 처음 만들면 "+ StudyStatus.DRAFT +" 상태한다."),
+//	//		실제 값이 기대한 값과 같은지 확인
+//	//		람다 문법 함수로 할 시, 오류가 생길 때만 실행함.		
+//			() -> assertTrue(study.getLimit() > 0, () -> "스터디 최대 참석 가능 인원은 0보다 커야 한다.")
+//		);
+		
+		
+		
+//		assertEquals(StudyStatus.DRAFT, study.getStatus(), new Supplier<String>() {
+//			@Override
+//			public String get() {
+//				// TODO Auto-generated method stub
+//				return "오류 상태";
+//			}
+//		});
+	}
 	
 	@Order(4)
 	//@DisplayName("스터디 만들기 반복 - disabled")
@@ -121,82 +205,7 @@ class StudyTests {
 //		
 //	}
 	
-	int value = 1;
-	
-	@Order(1)//test 순서를 정함. 첫번째
-	@SlowTest
-//	@Disabled -> unabled test unit
-//	@Tag("slow")
-	@DisplayName("스터디 만들기 tag slow")
-	void create1_new_study_again () {
-		System.out.println(value++);
-		System.out.println("create slow tag test");
-	}
-	
-	@Order(2)
-	@FastTest //customAnnotation
-	@DisplayName("스터디 만들기 ^^ tag fast")
-//	@Tag("fast") => FastTest로 생략가능
-	void create_new_study () {
-		System.out.println(value++);
-		System.out.println("create fast Tag test");
-		
-		
-		
-//		특정한 조건을 만족하는 경우에 테스트를 실행하는 방법.
-//		환경변수 - test_env 가 local인 경우에 test 진행
-//		String test_env = System.getenv("TEST_ENV");
-//		System.out.println(test_env);
-//		assumeTrue("LOCAL".equalsIgnoreCase(test_env));
-		
-//		특정한 조건을 건 테스트
-//		assumingThat("LOCAL".equalsIgnoreCase(test_env), () -> {
-//			System.out.println("LOCAL");
-//			Study actual = new Study(100);
-//			assertThat(actual.getLimit()).isGreaterThan(0);
-//			
-//		});
-		
-		
-//		특정 시간 안에 실행이 완료되는지 확인
-//		assertTimeout(Duration.ofMillis(100), () -> {
-//			new Study(10);
-//			Thread.sleep(300);			
-//		});
-		// TODO ThreadLocal
-//		assertTimeoutPreemptively(null, null); 로 작성이 @Transaction 형식의 rollback이 실행이 되지 않을 수도 있음.
-//		300밀리초가 끝나지전에 종료
-		
-		
-//		Test 객체의 예외 사항 받기
-//		IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> new Study(-10));
-//		String message = exception.getMessage();
-//		assertEquals("limit은 0보다 커야한다.", exception.getMessage());
-		
-		
-		
-//		Study study = new Study(-10);
-		
-//		모든 확인 구문 확인 executables
-//		assertAll(
-//			() -> assertNotNull(study),
-//	//		값이 null이 아닌지 확인
-//			() -> assertEquals(StudyStatus.DRAFT, study.getStatus(), () -> "스터디를 처음 만들면 "+ StudyStatus.DRAFT +" 상태한다."),
-//	//		실제 값이 기대한 값과 같은지 확인
-//	//		람다 문법 함수로 할 시, 오류가 생길 때만 실행함.		
-//			() -> assertTrue(study.getLimit() > 0, () -> "스터디 최대 참석 가능 인원은 0보다 커야 한다.")
-//		);
-		
-		
-		
-//		assertEquals(StudyStatus.DRAFT, study.getStatus(), new Supplier<String>() {
-//			@Override
-//			public String get() {
-//				// TODO Auto-generated method stub
-//				return "오류 상태";
-//			}
-//		});
-	}
+
 
 	@BeforeAll
 	void beforeAll () {

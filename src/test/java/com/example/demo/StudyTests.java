@@ -140,7 +140,7 @@ class StudyTests {
 		
 //		Study study = new Study(argumentsAccessor.getInteger(0), argumentsAccessor.getString(1));
 //		System.out.println(study);
-//		인자 - ArgumentsAccessor argumentsAccessor
+//		인자 - ArgumentsAccessor argumentsAccessor => 인자를 받아 인스턴스
 		
 		//		System.out.println(new Study(limit, name)); // 인자 Integer limit , String name
 		

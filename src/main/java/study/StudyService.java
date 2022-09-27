@@ -28,7 +28,10 @@ public class StudyService {
         Optional<Member> member = memberService.findById(memberId);
         study.setOwner(member.orElseThrow(() -> new IllegalArgumentException("Member doesn't exist for id: '" + memberId + "'")));
         //생성
-        return repository.save(study);//JPA method
+        Study newstudy = repository.save(study);
+        memberService.notify(newstudy);//새로운 study에 대한 알림
+        memberService.notify(member.get());//member에 대한 알림
+        return newstudy;//JPA method
     }
 
 }

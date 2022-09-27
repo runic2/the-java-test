@@ -1,16 +1,19 @@
 package study;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -38,36 +41,30 @@ class StudyServiceTest {
         member.setId(1L);
         member.setEmail("keesun@email.com");
         
+        Study study = new Study(10, "java");
+        
         //Stubbing
 //        when(memberService.findById(1L)).thenReturn(Optional.of(member));
         //any() => 모든 값 대응
         when(memberService.findById(any())).thenReturn(Optional.of(member));
-        Study study = new Study(10, "java");
-        //위 스터빙에 따라 1L => return member
-        Optional<Member> findbyId = memberService.findById(1L);
-        assertEquals("keesun@email.com", findbyId.get().getEmail());//true
+        when(studyRepository.save(study)).thenReturn(study);
         
-        //특정값에 예외가 도출되게 함
-        doThrow(new IllegalArgumentException()).when(memberService).validate(1L);
-        assertThrows(IllegalArgumentException.class, () -> {
-        	memberService.validate(1L);
-        });
+        //notify() 한번 실행
+        studyService.createNewStudy(1L, study);
         
-        //여러번 호출 될 때,
-        when(memberService.findById(any()))
-                .thenReturn(Optional.of(member))
-                .thenThrow(new RuntimeException())
-                .thenReturn(Optional.empty());
-//        1.
-        Optional<Member> byId = memberService.findById(1L);
-        assertEquals("keesun@email.com", byId.get().getEmail());
-
-//        2.
-        assertThrows(RuntimeException.class, () -> {
-            memberService.findById(2L);
-        });
+        //memberService의 notify(study) method가 1번 호출 되어야 한다. test
+        verify(memberService, times(1)).notify(study);
+        verify(memberService, times(1)).notify(member);
+        //validate()가 한번도 실행되지 않음.
+        verify(memberService, never()).validate(any());
         
-//        3.
-        assertEquals(Optional.empty(), memberService.findById(3L));
+        //method 순서 확인
+        InOrder inOrder = inOrder(memberService);        
+        inOrder.verify(memberService).notify(study);
+        inOrder.verify(memberService).notify(member);
+        
+        //어떠한 액션 이후에 더 이상 객체를 사용하지 않아야 함.
+//        verifyNoInteractions(memberService);
+        
     }
 }

@@ -12,11 +12,9 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.RepetitionInfo;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,11 +26,13 @@ import org.junit.jupiter.params.converter.ArgumentConversionException;
 import org.junit.jupiter.params.converter.SimpleArgumentConverter;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import domain.Study;
+
 //@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class) //replace [underScore => blank]
 //@TestInstance(TestInstance.Lifecycle.PER_CLASS)//test 한 번만 Instance 함
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)//test 순서를 정해줌
 //@ExtendWith(FindSlowTestExtension.class)//선언적으로 등록 - 확장모델
-class StudyTests {
+class StudyfottestTests {
 	
 	int value = 1;
 	

@@ -1,19 +1,17 @@
 package study;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.never;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -31,8 +29,10 @@ class StudyServiceTest {
 	StudyRepository studyRepository;
 	
 	@Test
+	@DisplayName("Mockito BDD 스타일 API")
     void createNewStudy(@Mock MemberService memberService,
                             @Mock StudyRepository studyRepository) {
+		// Given
         StudyService studyService = new StudyService(memberService, studyRepository);
         //Test할 객체 생성 
         assertNotNull(studyService);
@@ -46,25 +46,25 @@ class StudyServiceTest {
         //Stubbing
 //        when(memberService.findById(1L)).thenReturn(Optional.of(member));
         //any() => 모든 값 대응
-        when(memberService.findById(any())).thenReturn(Optional.of(member));
-        when(studyRepository.save(study)).thenReturn(study);
+//        when(memberService.findById(any())).thenReturn(Optional.of(member));
+//        when(studyRepository.save(study)).thenReturn(study);
         
+//        import static
+        given(memberService.findById(1L)).willReturn(Optional.of(member));
+        given(studyRepository.save(study)).willReturn(study);
+        
+        // When
         //notify() 한번 실행
         studyService.createNewStudy(1L, study);
         
+        // Then
+        assertEquals(member, study.getOwner());
         //memberService의 notify(study) method가 1번 호출 되어야 한다. test
-        verify(memberService, times(1)).notify(study);
-        verify(memberService, times(1)).notify(member);
-        //validate()가 한번도 실행되지 않음.
-        verify(memberService, never()).validate(any());
-        
-        //method 순서 확인
-        InOrder inOrder = inOrder(memberService);        
-        inOrder.verify(memberService).notify(study);
-        inOrder.verify(memberService).notify(member);
-        
+//        verify(memberService, times(1)).notify(study);
+        then(memberService).should(times(1)).notify(study);
         //어떠한 액션 이후에 더 이상 객체를 사용하지 않아야 함.
 //        verifyNoInteractions(memberService);
+        then(memberService).shouldHaveNoInteractions();
         
     }
 }

@@ -33,5 +33,13 @@ public class StudyService {
         memberService.notify(member.get());//member에 대한 알림
         return newstudy;//JPA method
     }
+    
+    public Study openStudy(Study study) {
+        study.open();
+        //localtime 저장, status -> OPENED
+        Study openedStudy = repository.save(study);
+        memberService.notify(openedStudy);
+        return openedStudy;
+    }
 
 }
